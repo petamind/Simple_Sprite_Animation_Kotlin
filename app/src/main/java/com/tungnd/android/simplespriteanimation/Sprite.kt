@@ -8,7 +8,7 @@ import android.graphics.*
  * http://untamed.wild-refuge.net/rmxpresources.php?characters
  */
 class Sprite : Runnable {
-    private val frameInterval = 1000L/4
+    private val walkingInterval = 1000L/4
     var movingDirection = Direction.DOWN
     private var frameToDraw = 0
     private var frameSize: Point
@@ -58,7 +58,7 @@ class Sprite : Runnable {
             }
             src.left = frameToDraw * frameSize.x
             src.right = (frameToDraw + 1) * frameSize.x
-            Thread.sleep(frameInterval)
+            Thread.sleep(walkingInterval)
         }
     }
 

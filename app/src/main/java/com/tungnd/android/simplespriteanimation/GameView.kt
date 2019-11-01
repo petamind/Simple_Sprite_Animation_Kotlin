@@ -9,17 +9,21 @@ import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.SurfaceHolder
 import android.view.SurfaceView
+import android.icu.lang.UCharacter.GraphemeClusterBreak.T
+import android.icu.lang.UCharacter.GraphemeClusterBreak.T
 
 
-class GameView: SurfaceView, Runnable, SurfaceHolder.Callback, GameLoop{
+class GameView : SurfaceView, Runnable, SurfaceHolder.Callback, GameLoop {
     private var sprites = ArrayList<Sprite>()
     private var mCanvas: Canvas? = null
     private var mHolder: SurfaceHolder? = null
-    private  var mThread: Thread
-    private var myGestureDetector:GestureDetector
+    private var mThread: Thread
+    private var myGestureDetector: GestureDetector
+    val FRAME_RATE = 60
+    val MS_PER_SECOND = 1000L / FRAME_RATE
 
-    constructor(ctx:Context): super(ctx)
-    constructor(context: Context?, attributeSet: AttributeSet): super(context, attributeSet)
+    constructor(ctx: Context) : super(ctx)
+    constructor(context: Context?, attributeSet: AttributeSet) : super(context, attributeSet)
 
     init {
         mHolder = holder
@@ -29,29 +33,41 @@ class GameView: SurfaceView, Runnable, SurfaceHolder.Callback, GameLoop{
         mThread.start()
     }
 
-    override fun draw(){
+    override fun draw() {
         mCanvas?.drawColor(Color.WHITE)
-        for(sprite in sprites)
+        for (sprite in sprites)
             sprite.draw(mCanvas!!)
     }
 
     override fun update() {
-        for(sprite in sprites)
+        for (sprite in sprites)
             sprite.move()
     }
 
     override fun run() {
-        while(true){
-            if(mHolder?.surface?.isValid!!) {
+        var previous = System.currentTimeMillis()
+        var lag = 0.0
+        while (true) {
+
+            val current = System.currentTimeMillis()
+            val elapsed = current - previous
+            previous = current.toLong()
+            lag += elapsed
+
+            if (mHolder?.surface?.isValid!!) {
                 mCanvas = mHolder?.lockCanvas()
                 synchronized(sprites)
                 {
-                    update()
+                    while (lag >= MS_PER_SECOND) {
+                        update()
+                        lag -= MS_PER_SECOND;
+                    }
+
                     draw()
                 }
                 mHolder?.unlockCanvasAndPost(mCanvas)
             }
-            Thread.sleep(20)
+            //Thread.sleep(MS_PER_SECOND)
         }
     }
 
@@ -67,15 +83,15 @@ class GameView: SurfaceView, Runnable, SurfaceHolder.Callback, GameLoop{
     }
 
     override fun surfaceCreated(holder: SurfaceHolder?) {
-        for(sprite in sprites)
-            sprite.setDst(Point(width/2, height/2))
+        for (sprite in sprites)
+            sprite.setDst(Point(width / 2, height / 2))
     }
 
-    inner class MyGestureListener: GestureDetector.SimpleOnGestureListener {
-        constructor(): super()
+    inner class MyGestureListener : GestureDetector.SimpleOnGestureListener {
+        constructor() : super()
 
         override fun onDoubleTap(e: MotionEvent?): Boolean {
-            for(sprite in sprites)
+            for (sprite in sprites)
                 sprite.movingDirection = sprite?.movingDirection?.next()!!
             return true
         }
@@ -86,7 +102,6 @@ class GameView: SurfaceView, Runnable, SurfaceHolder.Callback, GameLoop{
                 val sprite = Sprite(context, R.drawable.xmasgirl3)
                 sprite.setDst(Point(e!!.x.toInt(), e!!.y.toInt()))
                 sprites.add(sprite)
-
             }
             return true
         }
