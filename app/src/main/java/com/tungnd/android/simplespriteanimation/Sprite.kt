@@ -13,6 +13,7 @@ class Sprite : Runnable {
     private var frameToDraw = 0
     private var frameSize: Point
     companion object {
+        @JvmField
         var sprite: Bitmap? = null
     }
     private var dst: Rect
