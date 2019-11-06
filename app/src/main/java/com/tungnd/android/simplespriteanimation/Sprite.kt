@@ -8,25 +8,28 @@ import android.graphics.*
  * http://untamed.wild-refuge.net/rmxpresources.php?characters
  */
 class Sprite : Runnable {
-    private val walkingInterval = 1000L/4
+    private val walkingInterval = 1000L / 4
     var movingDirection = Direction.DOWN
     private var frameToDraw = 0
     private var frameSize: Point
-    private var sprite: Bitmap
+    companion object {
+        var sprite: Bitmap? = null
+    }
     private var dst: Rect
     private var src: Rect
     private val pace = 1
 
     constructor(ctx: Context, id: Int, n_horizontal: Int = 4, n_vertical: Int = 4) {
-        sprite = BitmapFactory.decodeResource(ctx.resources, id)
-        frameSize = Point(sprite.width / n_horizontal, sprite.height / n_vertical)
+        if(sprite == null)
+            sprite = BitmapFactory.decodeResource(ctx.resources, id)
+        frameSize = Point(sprite!!.width / n_horizontal, sprite!!.height / n_vertical)
         dst = Rect(0, 0, frameSize.x, frameSize.y)
         src = Rect(0, 0, frameSize.x, frameSize.y)
         Thread(this).start()
     }
 
     fun draw(canvas: Canvas) {
-        canvas.drawBitmap(sprite, src, dst, null)
+        canvas.drawBitmap(sprite!!, src, dst, null)
     }
 
     fun setDst(p: Point){

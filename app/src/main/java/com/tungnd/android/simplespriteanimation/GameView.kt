@@ -9,8 +9,6 @@ import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.SurfaceHolder
 import android.view.SurfaceView
-import android.icu.lang.UCharacter.GraphemeClusterBreak.T
-import android.icu.lang.UCharacter.GraphemeClusterBreak.T
 
 
 class GameView : SurfaceView, Runnable, SurfaceHolder.Callback, GameLoop {
